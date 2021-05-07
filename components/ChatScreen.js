@@ -13,7 +13,6 @@ import { useState } from "react";
 import firebase from "firebase";
 import getRecipientEmail from "../utils/getRecipientEmail";
 function ChatScreen({ chat, messages }) {
-  console.log(chat, ">>>", messages);
   const [input, setInput] = useState("");
   const [user] = useAuthState(auth);
   const router = useRouter();

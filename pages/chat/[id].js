@@ -1,4 +1,5 @@
 import Head from "next/head";
+import { useEffect } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import styled from "styled-components";
 import ChatScreen from "../../components/ChatScreen";
@@ -8,6 +9,9 @@ import getRecipientEmail from "../../utils/getRecipientEmail";
 
 function Chat({ chat, messages }) {
   const [user] = useAuthState(auth);
+  console.log(chat);
+  console.log(messages);
+
   return (
     <Container>
       <Head>
@@ -24,6 +28,8 @@ function Chat({ chat, messages }) {
 export default Chat;
 export async function getServerSideProps(context) {
   const ref = db.collection("chats").doc(context.query.id);
+  console.log(context);
+
   const messagesRes = await ref
     .collection("messages")
     .orderBy("timestamp", "asc")
@@ -32,6 +38,7 @@ export async function getServerSideProps(context) {
     .map((doc) => ({
       id: doc.id,
       ...doc.data(),
+      //lose timestamp that's why get time again
     }))
     .map((messages) => ({
       ...messages,
@@ -42,7 +49,6 @@ export async function getServerSideProps(context) {
     id: chatRes.id,
     ...chatRes.data(),
   };
-  console.log(chat, messages);
   return {
     props: {
       messages: JSON.stringify(messages),
@@ -50,6 +56,7 @@ export async function getServerSideProps(context) {
     },
   };
 }
+
 const Container = styled.div`
   display: flex;
 `;

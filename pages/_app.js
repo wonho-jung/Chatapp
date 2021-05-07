@@ -5,9 +5,12 @@ import Login from "./login";
 import Loading from "./loading";
 import { useEffect } from "react";
 import firebase from "firebase";
+import { useRouter } from "next/router";
 function MyApp({ Component, pageProps }) {
   const [user, loading] = useAuthState(auth);
+  const router = useRouter();
 
+  console.log(user);
   useEffect(() => {
     if (user) {
       db.collection("users").doc(user.uid).set(
@@ -18,6 +21,7 @@ function MyApp({ Component, pageProps }) {
         },
         { merge: true }
       );
+      router.push("/");
     }
   }, [user]);
   if (loading) return <Loading />;

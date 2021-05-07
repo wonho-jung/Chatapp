@@ -8,11 +8,15 @@ import { auth, db } from "../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useCollection } from "react-firebase-hooks/firestore";
 import Chat from "./Chat";
+import { Router } from "@material-ui/icons";
+import { useRouter } from "next/router";
 function Sidebar() {
   const [user] = useAuthState(auth);
+  const router = useRouter();
+
   const userChatRef = db
     .collection("chats")
-    .where("users", "array-contains", user.email);
+    .where("users", "array-contains", user?.email);
   const [chatSnapshot] = useCollection(userChatRef);
   const createChat = () => {
     const input = prompt(
@@ -30,15 +34,17 @@ function Sidebar() {
     }
   };
   const chatAlreadyExists = (recipentEmail) =>
-    chatSnapshot?.docs.find(
+    !!chatSnapshot?.docs.find(
       (chat) =>
         chat.data().users.find((user) => user === recipentEmail)?.length > 0
     );
-
+  const signOut = () => {
+    auth.signOut();
+  };
   return (
     <Container>
       <Header>
-        <UserAvatar src={user.photoURL} onClick={() => auth.signOut()} />
+        <UserAvatar src={user.photoURL} onClick={signOut} />
 
         <IconContainer>
           <IconButton>

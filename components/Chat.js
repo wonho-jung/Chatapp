@@ -1,5 +1,5 @@
 import { Avatar } from "@material-ui/core";
-import { Router } from "@material-ui/icons";
+
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useCollection } from "react-firebase-hooks/firestore";
 import styled from "styled-components";
@@ -17,7 +17,7 @@ function Chat({ id, users }) {
     router.push(`/chat/${id}`);
   };
   const recipient = recipientSnapshot?.docs?.[0]?.data();
-  console.log(recipientEmail[0]);
+
   return (
     <Container onClick={enterChat}>
       {recipient ? (
