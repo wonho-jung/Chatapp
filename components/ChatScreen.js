@@ -9,7 +9,7 @@ import { useCollection } from "react-firebase-hooks/firestore";
 import Message from "./Message";
 import InsertEmoticonIcon from "@material-ui/icons/InsertEmoticon";
 import MicIcon from "@material-ui/icons/Mic";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import firebase from "firebase";
 import getRecipientEmail from "../utils/getRecipientEmail";
 import TimeAgo from "timeago-react";
@@ -20,6 +20,7 @@ function ChatScreen({ chat, messages }) {
   const [input, setInput] = useState("");
   const [user] = useAuthState(auth);
   const router = useRouter();
+  const endOfMessageRef = useRef(null);
   const [messagesSnapshot] = useCollection(
     db
       .collection("chats")
@@ -30,8 +31,9 @@ function ChatScreen({ chat, messages }) {
   const [recipientSnapshot] = useCollection(
     db
       .collection("users")
-      .where("email,", "==", getRecipientEmail(chat.users, user))
+      .where("email", "==", getRecipientEmail(chat.users, user))
   );
+
   console.log(recipientSnapshot);
   const showMessages = () => {
     if (messagesSnapshot) {
@@ -51,6 +53,13 @@ function ChatScreen({ chat, messages }) {
       ));
     }
   };
+  const scrollToBottom = () => {
+    endOfMessageRef.current.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
+
   const sendMessage = (e) => {
     e.preventDefault();
     db.collection("users").doc(user.uid).set(
@@ -67,10 +76,11 @@ function ChatScreen({ chat, messages }) {
       photoURL: user.photoURL,
     });
     setInput("");
+    scrollToBottom();
   };
   const recipient = recipientSnapshot?.docs?.[0]?.data();
   const recipientEmail = getRecipientEmail(chat.users, user);
-  console.log(recipientSnapshot?.docs?.[0]?.data());
+
   return (
     <Container>
       <Header>
@@ -101,7 +111,7 @@ function ChatScreen({ chat, messages }) {
       </Header>
       <MessageContainer>
         {showMessages()}
-        <EndOfMessage />
+        <EndOfMessage ref={endOfMessageRef} />
       </MessageContainer>
       <InputContainer>
         <InsertEmoticonIcon />
@@ -131,9 +141,11 @@ const HeaderInformation = styled.div`
   margin-left: 15px;
   flex: 1;
   > h3 {
+    margin: 0;
     margin-bottom: 3px;
   }
   > p {
+    margin: 0;
     font-size: 14px;
     color: gray;
   }
